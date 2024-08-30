@@ -10,6 +10,8 @@ dotenv.config();
 
 // Config Interface
 interface IConfig {
+	botServerUrl: string;
+	pv_version: string;
 	// Access control
 	whitelistedPhoneNumbers: string[];
 	whitelistedEnabled: boolean;
@@ -58,6 +60,8 @@ interface IConfig {
 
 // Config
 export const config: IConfig = {
+	botServerUrl: process.env.BOT_SERVER_URL || "http://127.0.0.1:8000", // Default: http://127.0.0.1:8000
+	pv_version: process.env.PV_VERSION, // for nagoya
 	whitelistedPhoneNumbers: process.env.WHITELISTED_PHONE_NUMBERS?.split(",") || [],
 	whitelistedEnabled: getEnvBooleanWithDefault("WHITELISTED_ENABLED", false),
 

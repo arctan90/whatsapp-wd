@@ -6,7 +6,7 @@ import constants from "./constants";
 
 // CLI
 import * as cli from "./cli/ui";
-import {handleIncomingMessage} from "./handlers/message";
+import {handleIncomingMessage, handleIncomingMessageV2} from "./handlers/message";
 
 // Config
 import {initAiConfig} from "./handlers/ai-config";
@@ -92,7 +92,7 @@ const start = async () => {
         // // Ignore if it's a quoted message, (e.g. Bot reply)
         // if (message.hasQuotedMsg) return;
 
-        await handleIncomingMessage(message);
+        await handleIncomingMessageV2(message);
     });
 
     // Reply to own message，自己创建消息的时候处理入口
