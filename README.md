@@ -17,6 +17,5 @@ Forked from https://github.com/askrella/whatsapp-chatgpt
 ## Run using pm2
 install package `npm install`
 
-run `pm2 start npm --name chat-bot --watch --namespace chat-bot-namespace -- run start`
-
-restart `pm2 restart -name chat-bot --watch --namespace chat-bot-namespace`
+run `pm2 start npm --name chat-bot --namespace chat-bot-namespace --no-autorestart -- run start`
+restart `pm2 restart npm --name chat-bot --namespace chat-bot-namespace --no-autorestart -- run start`
