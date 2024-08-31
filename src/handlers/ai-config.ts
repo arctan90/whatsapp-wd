@@ -21,7 +21,7 @@ let aiConfig: IAiConfig = {
 
 const initAiConfig = () => {
 	// Register commands
-	[ChatModule, GeneralModule, GptModule].forEach((module) => {
+	[ChatModule, GeneralModule].forEach((module) => {
 		aiConfig.commandsMap[module.key] = module.register();
 	});
 };

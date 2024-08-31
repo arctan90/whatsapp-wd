@@ -79,7 +79,7 @@ const start = async () => {
         // 初始化加载处理模块，调各个模块的register方法来配置初始化参数
         initAiConfig();
         // 初始化两个全局对象，chatGPT和openai，这两个都是官方的sdk
-        initOpenAI();
+        // initOpenAI();
     });
 
     // WhatsApp message
@@ -99,16 +99,16 @@ const start = async () => {
     client.on(Events.MESSAGE_CREATE, async (message: Message) => {
         cli.print("MESSAGE_CREATE: " + message.body);
 
-        // // Ignore if message is from status broadcast
-        // if (message.from == constants.statusBroadcast) return;
-        //
+        // Ignore if message is from status broadcast
+        if (message.from == constants.statusBroadcast) return;
+
         // // Ignore if it's a quoted message, (e.g. Bot reply)
         // if (message.hasQuotedMsg) return;
         //
-        // // Ignore if it's not from me
-        // if (!message.fromMe) return;
-        //
-        // await handleIncomingMessage(message);
+        // Ignore if it's not from me
+        if (!message.fromMe) return;
+
+        await handleIncomingMessageV2(message);
     });
 
     // WhatsApp initialization
