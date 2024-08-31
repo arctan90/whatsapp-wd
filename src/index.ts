@@ -3,6 +3,7 @@ import {Client, Message, Events, LocalAuth} from "whatsapp-web.js";
 
 // Constants
 import constants from "./constants";
+import config from "./config";
 
 // CLI
 import * as cli from "./cli/ui";
@@ -98,7 +99,7 @@ const start = async () => {
     // Reply to own message，自己创建消息的时候处理入口
     client.on(Events.MESSAGE_CREATE, async (message: Message) => {
         cli.print("MESSAGE_CREATE: " + message.body);
-
+        if (config.prefixSkippedForMe) return;
         // Ignore if message is from status broadcast
         if (message.from == constants.statusBroadcast) return;
 

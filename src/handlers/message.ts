@@ -19,9 +19,7 @@ const stopMap = []
 
 // Handles message
 async function handleIncomingMessageV2(message: Message) {
-    if (config.prefixSkippedForMe) {
-        return
-    }
+
     let messageString = message.body;
 
     // 人工接管
