@@ -99,17 +99,17 @@ const start = async () => {
     // Reply to own message，自己创建消息的时候处理入口
     client.on(Events.MESSAGE_CREATE, async (message: Message) => {
         cli.print("MESSAGE_CREATE: " + message.body);
-        if (config.prefixSkippedForMe) return;
-        // Ignore if message is from status broadcast
-        if (message.from == constants.statusBroadcast) return;
-
-        // Ignore if it's a quoted message, (e.g. Bot reply)
-        if (message.hasQuotedMsg) return;
+        // if (config.prefixSkippedForMe) return;
+        // // Ignore if message is from status broadcast
+        // if (message.from == constants.statusBroadcast) return;
         //
-        // Ignore if it's not from me
-        if (!message.fromMe) return;
-
-        await handleIncomingMessageV2(message);
+        // // Ignore if it's a quoted message, (e.g. Bot reply)
+        // if (message.hasQuotedMsg) return;
+        // //
+        // // Ignore if it's not from me
+        // if (!message.fromMe) return;
+        //
+        // await handleIncomingMessageV2(message);
     });
 
     // WhatsApp initialization

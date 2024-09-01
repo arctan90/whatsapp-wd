@@ -42,7 +42,7 @@ async function handleIncomingMessageV2(message: Message) {
     }
 
     // 忽略本账号 todo 按配置来
-    // if (message.fromMe) return;
+    if (message.fromMe) return;
 
     // Prevent handling old messages
     if (message.timestamp != null) {
