@@ -87,6 +87,7 @@ async function botRequest(text: string, uid: string) {
         body: JSON.stringify({
             'message': text,
             'uid': uid,
+            'source': config.biz_source,
         })
     };
 
