@@ -89,9 +89,6 @@ const handleMessageGPT = async (message: Message, prompt: string) => {
 const handleDeleteConversation = async (message: Message) => {
 	// Delete conversation
 	delete conversations[message.from];
-
-	// Reply
-	message.reply("Conversation context was resetted!");
 };
 
 async function sendVoiceMessageReply(message: Message, gptTextResponse: string) {
