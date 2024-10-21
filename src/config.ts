@@ -62,7 +62,7 @@ interface IConfig {
 // Config
 export const config: IConfig = {
 	biz_source: process.env.BIZ_SOURCE, // 对接的业务来源, 每个网站对应一种source，用来指示nagoya加载哪个assistant
-	botServerUrl: process.env.BOT_SERVER_URL || "http://127.0.0.1:8000", // Default: http://127.0.0.1:8000
+	botServerUrl: process.env.BOT_SERVER_URL || "http://127.0.0.1:56340", // Default: http://127.0.0.1:8000
 	pv_version: process.env.PV_VERSION, // for nagoya
 	whitelistedPhoneNumbers: process.env.WHITELISTED_PHONE_NUMBERS?.split(",") || [],
 	whitelistedEnabled: getEnvBooleanWithDefault("WHITELISTED_ENABLED", false),

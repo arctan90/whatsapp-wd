@@ -8,10 +8,9 @@ import config from "../config";
 import * as cli from "../cli/ui";
 
 // ChatGPT & DALLE
-import {handleDeleteConversation, handleMessageGPT} from "../handlers/gpt";
+import {handleDeleteConversation} from "../handlers/gpt";
 
 // Speech API & Whisper
-
 // For deciding to ignore old messages
 import {botReadyTimestamp} from "../index";
 
@@ -27,22 +26,25 @@ async function handleIncomingMessageV2(message: Message) {
         // todo 人工介入后会话清除
         await handleDeleteConversation(message);
         stopMap[message.from] = true;
+        cli.print('人工接管')
         return
     }
 
     if (startsWithIgnoreCase(messageString, '!leave') && message.fromMe) {
         // todo 人工服务离开
         delete stopMap[message.from];
+        cli.print('人工离开')
         return
     }
 
     // 人工已经介入直接返回
     if (stopMap[message.from]) {
+        cli.print('人工已接入')
         return
     }
 
     // 忽略本账号 todo 按配置来
-    if (message.fromMe) return;
+    // if (message.fromMe) return;
 
     // Prevent handling old messages
     if (message.timestamp != null) {
@@ -66,16 +68,18 @@ async function handleIncomingMessageV2(message: Message) {
     // Ignore groupchats if disabled 如果是群聊，同时配置中不允许群聊bot，则返回
     if ((await message.getChat()).isGroup && !config.groupchatsEnabled) return;
 
-    const response = await  botRequest(messageString, message.from)
-    await message.reply(response)
+    const answerValue = await  botRequest(messageString, message.from)
+    // fixme 引入3分钟未应答断开机制（调用针对uid的/reset消息，其中uid=message.from）
+    await message.reply(answerValue)
     return;
 }
 
 export {handleIncomingMessageV2};
 
 
+// 这里是调用GPT的入口
 async function botRequest(text: string, uid: string) {
-    const url = config.botServerUrl + "/chat/bluehost";
+    const url = config.botServerUrl + "/prompt";
 
     // Request options
     const options = {
@@ -85,9 +89,9 @@ async function botRequest(text: string, uid: string) {
             "pd-version": config.pv_version,
         },
         body: JSON.stringify({
-            'message': text,
+            'prompt': text,
             'uid': uid,
-            'source': config.biz_source,
+            // 'source': config.biz_source,
         })
     };
 
@@ -95,7 +99,10 @@ async function botRequest(text: string, uid: string) {
         const response = await fetch(url, options);
         if (response.ok) {
             // 解析 JSON 响应体
-            return await response.text();
+            const msg =  await response.text();
+            cli.print(msg)
+            const parsedResponse = JSON.parse(msg);
+            return parsedResponse.answer
         } else {
             // 处理非 2xx 响应
             return `Error: ${response.status}`;
