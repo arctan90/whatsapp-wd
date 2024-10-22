@@ -93,10 +93,12 @@ async function sendTimeoutMessage(message: Message) {
     try {
         const response = await fetch(url, options);
         if (!response.ok) {
+            cli.print('reset 执行失败：' + response.statusText)
             timeoutMessage = "ops, 重置会话";
         }
     } catch (error) {
-        timeoutMessage =  "ops, 重置会话";
+        timeoutMessage = "ops, 重置会话";
+        cli.print('reset 执行error：' + error.toString())
     }
 
     await message.reply(timeoutMessage);
@@ -119,7 +121,7 @@ async function botRequest(text: string, uid: string) {
             // 'source': config.biz_source,
         })
     };
-
+    cli.print('prompt 地址 ' + url)
     try {
         const response = await fetch(url, options);
         if (response.ok) {
@@ -129,9 +131,11 @@ async function botRequest(text: string, uid: string) {
             return parsedResponse.answer;
         } else {
             const msg = await response.text();
+            cli.print('prompt 执行失败' + response.statusText)
             return `Error: ${msg}`;
         }
     } catch (error) {
+        cli.print('prompt 执行失败：' + error.toString())
         return "出了点状况，请重试";
     }
 }
