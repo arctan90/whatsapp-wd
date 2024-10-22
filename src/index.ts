@@ -85,6 +85,7 @@ const start = async () => {
 
     // WhatsApp message
     client.on(Events.MESSAGE_RECEIVED, async (message: any) => {
+
         cli.print("MESSAGE_RECEIVED: " + message.body);
         // Ignore if message is from status broadcast
         if (message.from == constants.statusBroadcast) return;
@@ -100,7 +101,7 @@ const start = async () => {
     client.on(Events.MESSAGE_CREATE, async (message: Message) => {
         cli.print("MESSAGE_CREATE: " + message.body);
         // 不处理我自己发出的消息
-        // if (config.prefixSkippedForMe) return;
+        if (config.prefixSkippedForMe) return;
 
         // Ignore if message is from status broadcast
         if (message.from == constants.statusBroadcast) return;

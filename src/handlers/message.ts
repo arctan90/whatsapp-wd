@@ -41,7 +41,7 @@ async function handleIncomingMessageV2(message: Message) {
     }
 
     // 忽略本账号
-    // if (message.fromMe) return;
+    if (message.fromMe) return;
 
     // Prevent handling old messages
     if (message.timestamp != null) {
@@ -73,7 +73,7 @@ async function handleIncomingMessageV2(message: Message) {
 }
 
 async function sendTimeoutMessage(message: Message) {
-    let timeoutMessage = "由于会话3分钟内未收到新消息，该会话重置";
+    let timeoutMessage = "由于会话3分钟内未收到新消息，该会话已重置";
     // fixme 发/reset 消息
 
     const url = config.botServerUrl + "/reset";
@@ -93,10 +93,10 @@ async function sendTimeoutMessage(message: Message) {
     try {
         const response = await fetch(url, options);
         if (!response.ok) {
-            timeoutMessage = `Error: ${response.status}`;
+            timeoutMessage = "ops, 重置会话";
         }
     } catch (error) {
-        timeoutMessage =  "reset failed";
+        timeoutMessage =  "ops, 重置会话";
     }
 
     await message.reply(timeoutMessage);
@@ -128,10 +128,11 @@ async function botRequest(text: string, uid: string) {
             const parsedResponse = JSON.parse(msg);
             return parsedResponse.answer;
         } else {
-            return `Error: ${response.status}`;
+            const msg = await response.text();
+            return `Error: ${msg}`;
         }
     } catch (error) {
-        return "ops";
+        return "出了点状况，请重试";
     }
 }
 
