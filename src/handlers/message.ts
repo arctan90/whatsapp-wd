@@ -69,39 +69,81 @@ async function handleIncomingMessageV2(message: Message) {
     });
 
     const answerValue = await botRequest(messageString, uid);
-    await message.reply(markdownToClient(answerValue));
+    await message.reply(markdownToDiscordFormat(answerValue));
 }
 
-function markdownToClient(markdown) {
-    // Italics: text -> <i>text</i>
-    markdown = markdown.replace(/([^]+)_/g, '<i>$1</i>');
+function htmlToDiscordFormat(htmlString) {
+    // 移除所有HTML标签,保留文本内容
+    let plainText = htmlString.replace(/<[^>]+>/g, '');
 
-    // Bold: text -> <b>text</b>
-    // markdown = markdown.replace(/\([^\]+)\*/g, '<b>$1</b>');
-    markdown = markdown.replace(/\\([^]+)\\*/g, '<b>$1</b>');
+    // 转换斜体
+    plainText = plainText.replace(/(\s|^)<i>(.*?)<\/i>(\s|$)/g, '$1_$2_$3');
 
-    // Strikethrough: text -> <s>text</s>
-    markdown = markdown.replace(/([^]+)~/g, '<s>$1</s>');
+    // 转换粗体
+    plainText = plainText.replace(/(\s|^)<b>(.*?)<\/b>(\s|$)/g, '$1*$2*$3');
+    plainText = plainText.replace(/(\s|^)<strong>(.*?)<\/strong>(\s|$)/g, '$1*$2*$3');
 
-    // Monospace: text -> <code>text</code>
-    markdown = markdown.replace(/([^`]+)/g, '<code>$1</code>');
+    // 转换删除线
+    plainText = plainText.replace(/(\s|^)<s>(.*?)<\/s>(\s|$)/g, '$1~$2~$3');
+    plainText = plainText.replace(/(\s|^)<del>(.*?)<\/del>(\s|$)/g, '$1~$2~$3');
 
-    // Bulleted list: * text or - text -> <ul><li>text</li></ul>
-    markdown = markdown.replace(/(\*|\-)\s+(.+)/g, '<li>$2</li>');
-    markdown = markdown.replace(/(<li>.+<\/li>)/g, '<ul>$1</ul>');
+    // 转换等宽字体
+    plainText = plainText.replace(/(\s|^)<code>(.*?)<\/code>(\s|$)/g, '$1```$2```$3');
 
-    // Numbered list: 1. text -> <ol><li>text</li></ol>
-    markdown = markdown.replace(/\d+\.\s+(.+)/g, '<li>$1</li>');
-    markdown = markdown.replace(/(<li>.+<\/li>)/g, '<ol>$1</ol>');
+    // 转换无序列表
+    plainText = plainText.replace(/<ul>([\s\S]*?)<\/ul>/g, (match, p1) => {
+        return p1.replace(/<li>(.*?)<\/li>/g, '* $1\n');
+    });
 
-    // Quote: > text -> <blockquote>text</blockquote>
-    markdown = markdown.replace(/>\s+(.+)/g, '<blockquote>$1</blockquote>');
+    // 转换有序列表
+    plainText = plainText.replace(/<ol>([\s\S]*?)<\/ol>/g, (match, p1) => {
+        let index = 1;
+        return p1.replace(/<li>(.*?)<\/li>/g, () => `${index++}. $1\n`);
+    });
 
-    // Inline code: text -> <code>text</code>
-    markdown = markdown.replace(/([^]+)`/g, '<code>$1</code>');
+    // 转换引用
+    plainText = plainText.replace(/<blockquote>([\s\S]*?)<\/blockquote>/g, (match, p1) => {
+        return p1.split('\n').map(line => `> ${line}`).join('\n');
+    });
 
-    return markdown;
+    // 转换内联代码
+    plainText = plainText.replace(/(\s|^)<code>(.*?)<\/code>(\s|$)/g, '$1`$2`$3');
+
+    return plainText.trim();
 }
+
+function markdownToDiscordFormat(markdownString) {
+    let discordText = markdownString;
+
+    // 转换斜体
+    discordText = discordText.replace(/(\s|^)\*([^*\n]+)\*(\s|$)/g, '$1_$2_$3');
+    discordText = discordText.replace(/(\s|^)_([^_\n]+)_(\s|$)/g, '$1_$2_$3');
+
+    // 转换粗体
+    discordText = discordText.replace(/(\s|^)\*\*([^*\n]+)\*\*(\s|$)/g, '$1*$2*$3');
+    discordText = discordText.replace(/(\s|^)__([^_\n]+)__(\s|$)/g, '$1*$2*$3');
+
+    // 转换删除线
+    discordText = discordText.replace(/(\s|^)~~([^~\n]+)~~(\s|$)/g, '$1~$2~$3');
+
+    // 转换代码块
+    discordText = discordText.replace(/```[\s\S]*?```/g, match => match);
+
+    // 转换无序列表
+    discordText = discordText.replace(/^[\*\-\+] (.+)$/gm, '* $1');
+
+    // 转换有序列表
+    discordText = discordText.replace(/^\d+\. (.+)$/gm, match => match);
+
+    // 转换引用
+    discordText = discordText.replace(/^> (.+)$/gm, match => match);
+
+    // 转换内联代码
+    discordText = discordText.replace(/`([^`\n]+)`/g, match => match);
+
+    return discordText.trim();
+}
+
 
 async function sendTimeoutMessage(message: Message) {
     let timeoutMessage = "由于会话3分钟内未收到新消息，该会话已重置";
