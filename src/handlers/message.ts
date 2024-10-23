@@ -69,7 +69,7 @@ async function handleIncomingMessageV2(message: Message) {
     });
 
     const answerValue = await botRequest(messageString, uid);
-    await message.reply(markdownToDiscordFormat(answerValue));
+    await message.reply(htmlToDiscordFormat(answerValue));
 }
 
 function htmlToDiscordFormat(htmlString) {
