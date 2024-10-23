@@ -123,6 +123,9 @@ function htmlToDiscordFormat(htmlString) {
         }
     });
 
+    // 删除所有剩余的<code>和</code>标签
+    plainText = plainText.replace(/<\/?code>/g, '');
+
     return plainText.trim();
 }
 
