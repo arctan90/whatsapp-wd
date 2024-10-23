@@ -76,12 +76,15 @@ function htmlToDiscordFormat(htmlString) {
     // 保存<pre>和<code>标签内容
     let specialTags = [];
     htmlString = htmlString.replace(/<(pre|code)>([\s\S]*?)<\/\1>/g, (match, tag, content) => {
-        specialTags.push({ tag, content });
+        specialTags.push({ tag, content: content.replace(/&lt;/g, '<').replace(/&gt;/g, '>') });
         return `__SPECIAL_TAG_${specialTags.length - 1}__`;
     });
 
     // 移除所有HTML标签,保留文本内容
     let plainText = htmlString.replace(/<[^>]+>/g, '');
+
+    // 解码HTML实体
+    plainText = plainText.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 
     // 转换斜体
     plainText = plainText.replace(/(\s|^)<i>(.*?)<\/i>(\s|$)/g, '$1_$2_$3');
