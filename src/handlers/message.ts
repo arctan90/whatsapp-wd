@@ -73,11 +73,11 @@ async function handleIncomingMessageV2(message: Message) {
 }
 
 function htmlToDiscordFormat(htmlString) {
-    // 保存<pre>标签内容
-    let preTags = [];
-    htmlString = htmlString.replace(/<pre>([\s\S]*?)<\/pre>/g, (match, p1) => {
-        preTags.push(p1);
-        return `__PRE_TAG_${preTags.length - 1}__`;
+    // 保存<pre>和<code>标签内容
+    let specialTags = [];
+    htmlString = htmlString.replace(/<(pre|code)>([\s\S]*?)<\/\1>/g, (match, tag, content) => {
+        specialTags.push({ tag, content });
+        return `__SPECIAL_TAG_${specialTags.length - 1}__`;
     });
 
     // 移除所有HTML标签,保留文本内容
@@ -93,9 +93,6 @@ function htmlToDiscordFormat(htmlString) {
     // 转换删除线
     plainText = plainText.replace(/(\s|^)<s>(.*?)<\/s>(\s|$)/g, '$1~$2~$3');
     plainText = plainText.replace(/(\s|^)<del>(.*?)<\/del>(\s|$)/g, '$1~$2~$3');
-
-    // 转换等宽字体
-    plainText = plainText.replace(/(\s|^)<code>(.*?)<\/code>(\s|$)/g, '$1`$2`$3');
 
     // 转换无序列表
     plainText = plainText.replace(/<ul>([\s\S]*?)<\/ul>/g, (match, p1) => {
@@ -113,12 +110,14 @@ function htmlToDiscordFormat(htmlString) {
         return p1.split('\n').map(line => `> ${line}`).join('\n');
     });
 
-    // 转换内联代码
-    plainText = plainText.replace(/(\s|^)<code>(.*?)<\/code>(\s|$)/g, '$1`$2`$3');
-
-    // 恢复<pre>标签内容为Discord代码块
-    plainText = plainText.replace(/__PRE_TAG_(\d+)__/g, (match, p1) => {
-        return '```\n' + preTags[p1] + '\n```';
+    // 恢复<pre>和<code>标签内容
+    plainText = plainText.replace(/__SPECIAL_TAG_(\d+)__/g, (match, p1) => {
+        const { tag, content } = specialTags[p1];
+        if (tag === 'pre') {
+            return '```\n' + content + '\n```';
+        } else if (tag === 'code') {
+            return '`' + content + '`';
+        }
     });
 
     return plainText.trim();
