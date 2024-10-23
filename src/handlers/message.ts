@@ -69,7 +69,38 @@ async function handleIncomingMessageV2(message: Message) {
     });
 
     const answerValue = await botRequest(messageString, uid);
-    await message.reply(answerValue);
+    await message.reply(markdownToClient(answerValue));
+}
+
+function markdownToClient(markdown) {
+    // Italics: text -> <i>text</i>
+    markdown = markdown.replace(/([^]+)_/g, '<i>$1</i>');
+
+    // Bold: text -> <b>text</b>
+    // markdown = markdown.replace(/\([^\]+)\*/g, '<b>$1</b>');
+    markdown = markdown.replace(/\\([^]+)\\*/g, '<b>$1</b>');
+
+    // Strikethrough: text -> <s>text</s>
+    markdown = markdown.replace(/([^]+)~/g, '<s>$1</s>');
+
+    // Monospace: text -> <code>text</code>
+    markdown = markdown.replace(/([^`]+)/g, '<code>$1</code>');
+
+    // Bulleted list: * text or - text -> <ul><li>text</li></ul>
+    markdown = markdown.replace(/(\*|\-)\s+(.+)/g, '<li>$2</li>');
+    markdown = markdown.replace(/(<li>.+<\/li>)/g, '<ul>$1</ul>');
+
+    // Numbered list: 1. text -> <ol><li>text</li></ol>
+    markdown = markdown.replace(/\d+\.\s+(.+)/g, '<li>$1</li>');
+    markdown = markdown.replace(/(<li>.+<\/li>)/g, '<ol>$1</ol>');
+
+    // Quote: > text -> <blockquote>text</blockquote>
+    markdown = markdown.replace(/>\s+(.+)/g, '<blockquote>$1</blockquote>');
+
+    // Inline code: text -> <code>text</code>
+    markdown = markdown.replace(/([^]+)`/g, '<code>$1</code>');
+
+    return markdown;
 }
 
 async function sendTimeoutMessage(message: Message) {
