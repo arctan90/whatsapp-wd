@@ -46,6 +46,12 @@ class SessionTimer {
     cli.print(`当前活跃会话数：${count}`);
     return count;
   }
+
+  hasActiveSession(uid: string): boolean {
+    const hasSession = this.timers.has(uid);
+    cli.print(`检查用户 ${uid} 的会话状态: ${hasSession ? '活跃' : '不存在'}`);
+    return hasSession;
+  }
 }
 
 const sessionTimer = new SessionTimer();

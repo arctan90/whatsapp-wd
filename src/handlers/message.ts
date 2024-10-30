@@ -21,6 +21,10 @@ async function handleIncomingMessageV2(message: Message) {
     const messageString = message.body;
     const uid = message.from;
 
+    // 检查会话状态
+    const hasSession = sessionTimer.hasActiveSession(uid);
+    console.log(`用户 ${uid} 的会话状态: ${hasSession ? '活跃' : '新会话'}`);
+
     // 人工接管
     if (startsWithIgnoreCase(messageString, '!bot-stop') && message.fromMe) {
         stopMap[uid] = true;
