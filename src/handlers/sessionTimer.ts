@@ -49,7 +49,6 @@ class SessionTimer {
 
   hasActiveSession(uid: string): boolean {
     const hasSession = this.timers.has(uid);
-    cli.print(`检查用户 ${uid} 的会话状态: ${hasSession ? '活跃' : '不存在'}`);
     return hasSession;
   }
 }

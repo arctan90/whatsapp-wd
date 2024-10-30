@@ -28,19 +28,19 @@ async function handleIncomingMessageV2(message: Message) {
     // 人工接管
     if (startsWithIgnoreCase(messageString, '!bot-stop') && message.fromMe) {
         stopMap[uid] = true;
-        cli.print('人工接管');
+        console.log('人工接管');
         return;
     }
 
     if (startsWithIgnoreCase(messageString, '!leave') && message.fromMe) {
         delete stopMap[uid];
-        cli.print('人工离开');
+        console.log('人工离开');
         return;
     }
 
     // 人工已经介入直接返回
     if (stopMap[uid]) {
-        cli.print('人工已接入');
+        console.log('人工已接入');
         return;
     }
 
@@ -52,13 +52,13 @@ async function handleIncomingMessageV2(message: Message) {
         const messageTimestamp = new Date(message.timestamp * 1000);
 
         if (botReadyTimestamp == null) {
-            cli.print("Ignoring message because bot is not ready yet: " + messageString);
+            console.log("Ignoring message because bot is not ready yet: " + messageString);
             delete stopMap[uid];
             return;
         }
 
         if (messageTimestamp < botReadyTimestamp) {
-            cli.print("Ignoring old message: " + messageString);
+            console.log("Ignoring old message: " + messageString);
             delete stopMap[uid];
             return;
         }
@@ -187,12 +187,12 @@ async function sendTimeoutMessage(message: Message) {
     try {
         const response = await fetch(url, options);
         if (!response.ok) {
-            cli.print('reset 执行失败：' + response.statusText)
+            console.log('reset 执行失败：' + response.statusText)
             timeoutMessage = "ops, 重置会话";
         }
     } catch (error) {
         timeoutMessage = "ops, 重置会话";
-        cli.print('reset 执行error：' + error.toString())
+        console.log('reset 执行error：' + error.toString())
     }
 
     await message.reply(timeoutMessage);
@@ -215,21 +215,21 @@ async function botRequest(text: string, uid: string) {
             // 'source': config.biz_source,
         })
     };
-    cli.print('prompt 地址 ' + url)
+    console.log('prompt 地址 ' + url)
     try {
         const response = await fetch(url, options);
         if (response.ok) {
             const msg = await response.text();
-            cli.print(msg);
+            console.log(msg);
             const parsedResponse = JSON.parse(msg);
             return parsedResponse.answer;
         } else {
             const msg = await response.text();
-            cli.print('prompt 执行失败' + response.statusText)
+            console.log('prompt 执行失败' + response.statusText)
             return `Error: ${msg}`;
         }
     } catch (error) {
-        cli.print('prompt 执行失败：' + error.toString())
+        console.log('prompt 执行失败：' + error.toString())
         return "出了点状况，请重试";
     }
 }
