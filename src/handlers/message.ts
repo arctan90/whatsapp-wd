@@ -26,7 +26,7 @@ async function handleIncomingMessageV2(message: Message) {
     console.log(`用户 ${uid} 的会话状态: ${hasSession ? '活跃' : '新会话'}`);
 
     // 人工接管
-    if (startsWithIgnoreCase(messageString, '!bot-stop') && message.fromMe) {
+    if (startsWithIgnoreCase(messageString, '!hello') && message.fromMe) {
         stopMap[uid] = true;
         console.log('人工接管');
         return;
@@ -40,7 +40,6 @@ async function handleIncomingMessageV2(message: Message) {
 
     // 人工已经介入直接返回
     if (stopMap[uid]) {
-        console.log('人工已接入');
         return;
     }
 
