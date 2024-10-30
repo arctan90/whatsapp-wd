@@ -8,7 +8,7 @@ class SessionTimer {
 
   constructor() {
     this.timers = new Map();
-    this.TIMEOUT =  3 * 60 * 1000; // 3分钟，单位毫秒
+    this.TIMEOUT =  5 * 60 * 1000; // 5分钟，单位毫秒
     cli.print(`SessionTimer 初始化，超时时间设置为 ${this.TIMEOUT}ms`);
   }
 
