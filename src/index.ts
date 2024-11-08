@@ -83,6 +83,11 @@ const start = async () => {
         // initOpenAI();
     });
 
+    // 媒体上传，包括图片
+    client.on('media_uploaded', async (message: any) => {
+        cli.print("MEDIA_UPLOAD: " + message.body);
+    })
+
     // WhatsApp message
     client.on(Events.MESSAGE_RECEIVED, async (message: any) => {
 
