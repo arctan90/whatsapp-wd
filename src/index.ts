@@ -83,13 +83,32 @@ const start = async () => {
         // initOpenAI();
     });
 
-    // 媒体上传，包括图片
-    client.on('media_uploaded', async (message: any) => {
+    // 这个event只监听当前模拟程序上传媒体完成，不会监听UI消息上传的图片
+    client.on(Events.MEDIA_UPLOADED, async (message: any) => {
         cli.print("MEDIA_UPLOAD: " + message.body);
     })
 
     // WhatsApp message
     client.on(Events.MESSAGE_RECEIVED, async (message: any) => {
+        if (message.hasMedia) {
+            if (message.hasMedia) {
+                const media = await message.downloadMedia();
+                if (media) {
+                    // your processing code
+                    console.log('Media received');
+                    console.log(`Media Type: ${media.mimetype}`);
+                    console.log(`Base64 Data: ${media.data.slice(0, 100)}...`); // 显示部分数据
+
+                    // 如果是图片，可以保存到本地
+                    if (media.mimetype.startsWith('image')) {
+                        // const fs = require('fs');
+                        const filePath = `./uploads/${Date.now()}.jpg`;
+                        // fs.writeFileSync(filePath, media.data, { encoding: 'base64' });
+                        console.log(`Image saved to ${filePath}`);
+                    }
+                }
+            }
+        }
 
         cli.print("MESSAGE_RECEIVED: " + message.body);
         // Ignore if message is from status broadcast
