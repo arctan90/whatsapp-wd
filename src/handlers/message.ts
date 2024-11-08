@@ -110,7 +110,7 @@ async function handleIncomingMessageV2(message: Message) {
                 }
             }
         }
-        await message.reply('图片已上传');
+        await message.reply('上传成功');
         return;
     }
 
