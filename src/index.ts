@@ -7,7 +7,7 @@ import config from "./config";
 
 // CLI
 import * as cli from "./cli/ui";
-import {handleIncomingMessage, handleIncomingMessageV2} from "./handlers/message";
+import {handleIncomingMessageV2} from "./handlers/message";
 
 // Config
 import {initAiConfig} from "./handlers/ai-config";
@@ -90,26 +90,6 @@ const start = async () => {
 
     // WhatsApp message
     client.on(Events.MESSAGE_RECEIVED, async (message: any) => {
-        if (message.hasMedia) {
-            if (message.hasMedia) {
-                const media = await message.downloadMedia();
-                if (media) {
-                    // your processing code
-                    console.log('Media received');
-                    console.log(`Media Type: ${media.mimetype}`);
-                    console.log(`Base64 Data: ${media.data.slice(0, 100)}...`); // 显示部分数据
-
-                    // 如果是图片，可以保存到本地
-                    if (media.mimetype.startsWith('image')) {
-                        // const fs = require('fs');
-                        const filePath = `./uploads/${Date.now()}.jpg`;
-                        // fs.writeFileSync(filePath, media.data, { encoding: 'base64' });
-                        console.log(`Image saved to ${filePath}`);
-                    }
-                }
-            }
-        }
-
         cli.print("MESSAGE_RECEIVED: " + message.body);
         // Ignore if message is from status broadcast
         if (message.from == constants.statusBroadcast) return;

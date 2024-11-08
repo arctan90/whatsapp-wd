@@ -15,6 +15,10 @@ import {botReadyTimestamp} from "../index";
 
 const stopMap: Record<string, boolean> = {};
 
+interface SpecialTag {
+    tag: string;
+    content: string;
+}
 
 // 处理消息
 async function handleIncomingMessageV2(message: Message) {
@@ -71,13 +75,50 @@ async function handleIncomingMessageV2(message: Message) {
         await sendTimeoutMessage(message);
     });
 
+    // 正式开始出来逻辑
+    // 1. 如果带图，则先传图
+    if (message.hasMedia) {
+        if (message.hasMedia) {
+            const media = await message.downloadMedia();
+            if (media) {
+                try {
+                    // 创建表单数据
+                    const formData = new FormData();
+                    formData.append('uid', uid); // 添加 uid 参数
+                    formData.append('client_biz', 'question')
+                    formData.append('client_source', 'whatsapp')
+
+                    // 将图片数据作为文件附加到表单
+                    const buffer = Buffer.from(media.data, 'base64');
+                    const blob = new Blob([buffer], { type: media.mimetype });
+                    formData.append('image', blob, media.filename || 'image.jpg');
+
+                    // 使用 fetch 发送请求
+                    const response = await fetch('http://localhost:56340/img/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Image uploaded successfully:', result);
+                    } else {
+                        console.error(`Failed to upload image: ${response.status} ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error('Failed to upload image:', error.message);
+                }
+            }
+        }
+    }
+
     const answerValue = await botRequest(messageString, uid);
     await message.reply(htmlToDiscordFormat(answerValue));
 }
 
 function htmlToDiscordFormat(htmlString) {
-    // 保存<pre>和<code>标签内容
-    let specialTags = [];
+    // 定义带类型的数组
+    let specialTags: SpecialTag[] = [];
     htmlString = htmlString.replace(/<(pre|code)>([\s\S]*?)<\/\1>/g, (match, tag, content) => {
         specialTags.push({ tag, content: content.replace(/&lt;/g, '<').replace(/&gt;/g, '>') });
         return `__SPECIAL_TAG_${specialTags.length - 1}__`;
