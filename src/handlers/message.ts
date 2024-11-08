@@ -110,6 +110,8 @@ async function handleIncomingMessageV2(message: Message) {
                 }
             }
         }
+        await message.reply('图片已上传');
+        return;
     }
 
     const answerValue = await botRequest(messageString, uid);
